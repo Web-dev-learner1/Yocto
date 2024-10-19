@@ -1,3 +1,6 @@
+type expr =
+  | IfElse of expr * statement * statement  (* Add the IfElse type *)
+
 type util = 
   | Int of int
   | Double of float
@@ -16,6 +19,7 @@ type statement =
     | VariableDeclarationExpr of string * string * util
     | FunctionDeclaration of string * (string * string) list * statement list
     | ReturnStatement of util
+    | IfElseStatement of expr * block * block  (* Add IfElseStatement for handling blocks *)
 
 type block = statement list
 
@@ -49,6 +53,14 @@ and
         print_block_r body;
         Printf.printf "}\n";
     | ReturnStatement(e) -> print_expr (Return e)  
+    | IfElseStatement(cond, then_block, else_block) ->  (* Handle IfElseStatement *)
+      Printf.printf "if (";
+      print_expr cond;  (* Print the condition expression *)
+      Printf.printf ") {\n";
+      print_block_r then_block;  (* Print the 'then' block *)
+      Printf.printf "} else {\n";
+      print_block_r else_block;  (* Print the 'else' block *)
+      Printf.printf "}\n";
 and 
   print_block_r (b:block): unit = 
     match b with

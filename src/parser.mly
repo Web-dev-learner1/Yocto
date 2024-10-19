@@ -9,6 +9,7 @@
 %token LPAREN RPAREN LBRACE RBRACE
 %token EQUAL EQ NE LT LE GT GE AND OR CARET
 %token COMMA SEMICOLON RETURN FN WRITE
+%token IF ELSE
 %token EOF
 
 %type <string> ident
@@ -17,6 +18,7 @@
 %type <Expr.util list> call_args
 %type <Expr.block> program block_items block
 %type <Expr.statement> block_item var_decl func_decl
+%type <Expr.statement> if_else_stmt
 %type <string> comparison
 %start program
 
@@ -31,6 +33,7 @@ block_item: var_decl { $1 }
     | func_decl { $1 }
     | RETURN expr SEMICOLON { ReturnStatement($2) }
     | expr SEMICOLON { Expr($1) }
+    | if_else_stmt { $1 }  (* Added if-else support *)
     ;
 
 block: LBRACE block_items RBRACE { $2 }
@@ -88,6 +91,15 @@ comparison:
     | AND { "&&" } 
     | OR { "||" } 
     ;
+
+if_else_stmt: IF LPAREN expr RPAREN block ELSE block { 
+        IfElse ($3, $5, $7) 
+    }
+    | IF LPAREN expr RPAREN block { 
+        IfElse ($3, $5, [] )  (* No else block *)
+    }
+    ;
+
 
 %%
 
